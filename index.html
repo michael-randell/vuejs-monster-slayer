@@ -12,43 +12,96 @@
     <section class="row">
         <div class="small-6 columns">
             <h1 class="text-center">YOU</h1>
-            <div class="healthbar">
-                <div class="healthbar text-center" style="background-color: green; margin: 0; color: white;">
+            <div class="healthbar-background">
+                <div class="healthbar text-center" :style="{width: playerHealth + '%'}">
 
                 </div>
             </div>
         </div>
         <div class="small-6 columns">
             <h1 class="text-center">MONSTER</h1>
-            <div class="healthbar">
-                <div class="healthbar text-center" style="background-color: green; margin: 0; color: white;">
+            <div class="healthbar-background">
+                <div class="healthbar text-center" :style="{width: monsterHealth + '%'}">
 
                 </div>
             </div>
         </div>
     </section>
-    <section class="row controls">
+    <section class="row controls" v-if="!isGameActive">
         <div class="small-12 columns">
-            <button id="start-game">START NEW GAME</button>
+            <button id="start-game" @click="isGameActive = !isGameActive">START NEW GAME</button>
         </div>
     </section>
-    <section class="row controls">
+    <section class="row controls" v-if="isGameActive">
         <div class="small-12 columns">
-            <button id="attack">ATTACK</button>
-            <button id="special-attack">SPECIAL ATTACK</button>
-            <button id="heal">HEAL</button>
-            <button id="give-up">GIVE UP</button>
+            <button id="attack" @click="attack">ATTACK</button>
+            <button id="special-attack" @click="specialAttack">SPECIAL ATTACK</button>
+            <button id="heal" @click="heal">HEAL</button>
+            <button id="give-up" @click="endGame">GIVE UP</button>
         </div>
     </section>
-    <section class="row log">
+    <section class="row log" v-if="actionList.length > 0">
         <div class="small-12 columns">
             <ul>
-                <li>
-
+                <li v-for="action in actionList">
+                    <div :class="action.actor + 'ActionClass'">{{action.message}}</div>
                 </li>
             </ul>
         </div>
     </section>
 </div>
 </body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            isGameActive: false,
+            actionList: [],
+            playerHealth: 100, 
+            monsterHealth: 100
+        },
+        methods: {
+            attack: function () {
+                let playerDamage = Math.floor(Math.random() * 10);
+                let monsterDamage = Math.floor(Math.random() * 10);
+                this.playerHealth -= monsterDamage;
+                this.monsterHealth -= playerDamage;
+                this.addActions(monsterDamage, playerDamage);
+                this.checkGameStatus(this.monsterHealth, this.playerHealth);
+            },
+            specialAttack: function () {
+                let playerDamage = Math.floor(Math.random() * 10) * 2;
+                let monsterDamage = Math.floor(Math.random() * 10);
+                this.playerHealth -= monsterDamage;
+                this.monsterHealth -= playerDamage;
+                this.addActions(monsterDamage, playerDamage);
+                this.checkGameStatus(this.monsterHealth, this.playerHealth);
+            },
+            heal: function () {
+                if (this.playerHealth < 100) {
+                    this.playerHealth += 5;
+                }             
+            },
+            addActions: function (monsterDamage, playerDamage) {
+                this.actionList.unshift({actor: 'player', message: `Player hits monster for ${monsterDamage}`});
+                this.actionList.unshift({actor: 'monster', message: `Monster hits player for ${playerDamage}`});
+            },
+            endGame: function () {
+                this.actionList = [];
+                this.isGameActive = false;
+                this.playerHealth = 100;
+                this.monsterHealth = 100;
+            },
+            checkGameStatus: function (monsterHealth, playerHealth) {
+                if (monsterHealth <= 0) {
+                    alert('You slayed the monster!');
+                    this.endGame();
+                } else if (playerHealth <= 0) {
+                    alert('The monster killed you..');
+                    this.endGame();
+                }
+            }
+        }
+    });  
+ </script>
 </html>

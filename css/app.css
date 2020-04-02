@@ -3,6 +3,13 @@
 }
 
 .healthbar {
+    height: 40px;
+    background-color: green;
+    margin: 0;
+    transition: width 500ms;
+}
+
+.healthbar-background {
     width: 80%;
     height: 40px;
     background-color: #eee;
@@ -91,4 +98,14 @@ button {
 
 #give-up:hover {
     background-color: #c7c7c7;
+}
+
+.playerActionClass {
+    background-color: #89cff0;
+    color: blue;
+}
+
+.monsterActionClass {
+    background-color: #ffcccb;
+    color: red;
 }
